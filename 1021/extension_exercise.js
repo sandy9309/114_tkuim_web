@@ -1,12 +1,12 @@
 
 
-// 將輸入字串轉成數字
+
 function toNumber(str) {
   var n = parseFloat(str);
   return isNaN(n) ? null : n;
 }
 
-// 溫度轉換
+
 function CtoF(c) { return c * 9 / 5 + 32; }
 function FtoC(f) { return (f - 32) * 5 / 9; }
 
@@ -33,7 +33,7 @@ function runTempConverter() {
   return result;
 }
 
-// 隨機數生成
+
 function randomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -59,7 +59,7 @@ function runGuessGame() {
   return '答案：' + answer + '\n共猜了 ' + count + ' 次';
 }
 
-// ===== 主流程 =====
+
 
 var mainChoice = prompt('請選擇遊戲：\n1. 溫度轉換器\n2. 猜數字遊戲');
 
@@ -75,7 +75,7 @@ switch(mainChoice) {
     output = '未選擇有效遊戲';
 }
 
-// 顯示結果
+
 alert(output);
 document.getElementById('result').textContent = output;
 console.log(output);
