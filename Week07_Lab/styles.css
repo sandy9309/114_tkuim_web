@@ -1,0 +1,32 @@
+/* styles.css */
+
+/* 全局設定 */
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background-color:#A7C7E7;
+}
+
+/* 卡片置中 */
+.card {
+  background-color: #FFE0E0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+button.btn {
+  background-color: #DCDCDC;
+  color: black;
+  border-radius: 8px;
+}
+
+
+/* input hover 與 focus */
+input.form-control:hover {
+  border-color: #80bdff;
+}
+input.form-control:focus {
+  border-color:	#E6E6FA;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
