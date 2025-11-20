@@ -1,0 +1,47 @@
+### 狀態檢查
+GET http://localhost:3001/health
+
+### 建立報名 (成功案例)
+POST http://localhost:3001/api/signup
+Content-Type: application/json
+
+{
+  "name": "測試使用者",
+  "email": "test@gmail.com",
+  "phone": "0912345678",
+  "password": "Password123",
+  "confirmPassword": "Password123",
+  "interests": ["音樂", "旅遊"],
+  "terms": true
+}
+
+### 建立報名 (失敗案例 - 缺少欄位)
+POST http://localhost:3001/api/signup
+Content-Type: application/json
+
+{
+  "name": "失敗測試",
+  "email": "fail@gmail.com",
+  "phone": "0912345678",
+  "password": "Password123",
+  "confirmPassword": "Password123",
+  "interests": ["音樂", "旅遊"]
+  // 缺少 terms: true
+}
+
+### 建立報名 (失敗案例 - 密碼不符)
+POST http://localhost:3001/api/signup
+Content-Type: application/json
+
+{
+  "name": "失敗測試2",
+  "email": "fail2@gmail.com",
+  "phone": "0912345678",
+  "password": "Password123",
+  "confirmPassword": "WrongPassword",
+  "interests": ["音樂", "旅遊"],
+  "terms": true
+}
+
+### 查看清單
+GET http://localhost:3001/api/signup
