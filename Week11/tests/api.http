@@ -4,16 +4,18 @@ Content-Type: application/json
 
 {
   "name": "新同學",
-  "email": "new@example.com",
+  "email": "neww@example.com",
   "phone": "0911222333"
 }
 ### 取得清單
 GET http://localhost:3001/api/signup
 
 ### 更新
-PATCH http://localhost:3001/api/signup/{{last_id}}
+PATCH http://localhost:3001/api/signup/6930fa685a344a80cb38d428
 Content-Type: application/json
 
 {
   "phone": "0911000111"
 }
+
+DELETE http://localhost:3001/api/signup/6930fa685a344a80cb38d428
