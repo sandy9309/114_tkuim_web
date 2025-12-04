@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>會員註冊表單 - Week 11 API 整合</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+    }
+    .form-control,
+    .btn {
+      border-radius: 0.5rem;
+    }
+    .progress {
+      height: 6px;
+    }
+    #list-display {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+
+<body class="py-5 bg-light d-flex align-items-center justify-content-center">
+  <div class="container">
+    <div class="card shadow-lg mx-auto" style="max-width: 600px;">
+      <div class="card-body p-5">
+        <h3 class="mb-4 text-center text-primary fw-bold">活動報名表單 (Week 11 API)</h3>
+
+        <form id="signup-form" novalidate>
+          <div class="mb-3">
+            <label for="name" class="form-label">姓名</label>
+            <input type="text" id="name" name="name" class="form-control" required aria-describedby="name-error" />
+            <p id="name-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-control" required aria-describedby="email-error" />
+            <p id="email-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="mb-3">
+            <label for="phone" class="form-label">手機</label>
+            <input type="tel" id="phone" name="phone" class="form-control" required maxlength="10" inputmode="numeric" aria-describedby="phone-error" />
+            <p id="phone-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">密碼 (前端驗證)</label>
+            <input type="password" id="password" name="password" class="form-control" required aria-describedby="password-error" />
+            <p id="password-error" class="text-danger small mb-1"></p>
+            <div id="strength-bar" class="progress d-none">
+              <div class="progress-bar" role="progressbar"></div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirm-password" class="form-label">確認密碼</label>
+            <input type="password" id="confirm-password" name="confirm-password" class="form-control" required aria-describedby="confirm-password-error" />
+            <p id="confirm-password-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label d-block">興趣（至少勾選一項）</label>
+            <div id="interests" class="d-flex flex-wrap gap-3">
+              <div><input type="checkbox" id="sports" value="運動" /> <label for="sports">運動</label></div>
+              <div><input type="checkbox" id="music" value="音樂" /> <label for="music">音樂</label></div>
+              <div><input type="checkbox" id="travel" value="旅遊" /> <label for="travel">旅遊</label></div>
+              <div><input type="checkbox" id="reading" value="閱讀" /> <label for="reading">閱讀</label></div>
+            </div>
+            <p id="interests-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="terms" required aria-describedby="terms-error" />
+            <label for="terms" class="form-check-label">我已閱讀並同意服務條款</label>
+            <p id="terms-error" class="text-danger small mb-0"></p>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <button type="reset" id="reset-btn" class="btn btn-outline-secondary">重設</button>
+            <button type="submit" id="submit-btn" class="btn btn-primary">送出</button>
+          </div>
+
+          <div id="api-message-area" class="mt-3">
+            <div id="success-message" class="alert alert-success d-none"></div>
+            <div id="error-message" class="alert alert-danger d-none"></div>
+          </div>
+
+          <div class="mt-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-2 gap-2">
+              <button type="button" id="view-list-btn" class="btn btn-info btn-sm w-100 w-sm-auto">查看報名清單</button>
+
+              <div id="pagination-controls" class="btn-group btn-group-sm d-none" role="group">
+                <button id="prev-btn" class="btn btn-outline-primary" disabled>上一頁</button>
+                <span class="btn btn-light border-top border-bottom">
+                  Page <span id="current-page-span">1</span> / <span id="total-pages-span">?</span>
+                </span>
+                <button id="next-btn" class="btn btn-outline-primary" disabled>下一頁</button>
+              </div>
+            </div>
+
+            <p id="list-total-info" class="text-muted small mb-1 d-none text-center"></p>
+            <pre id="list-display" class="border p-3 d-none bg-light rounded"></pre>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="signup_form.js"></script>
+</body>
+</html>
