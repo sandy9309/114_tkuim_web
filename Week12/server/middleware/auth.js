@@ -5,15 +5,19 @@ export function authMiddleware(req, res, next) {
   if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ error: '缺少授權資訊' });
   }
+
   const token = authHeader.replace('Bearer ', '');
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    // 確保包含 id, email, role
     req.user = { id: payload.sub, email: payload.email, role: payload.role };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Token 無效或已過期' });
   }
 }
+
+// 用於限制只有特定角色（如 admin）可進入某些路由
 export function requireRole(...roles) {
   return function (req, res, next) {
     if (!req.user || !roles.includes(req.user.role)) {

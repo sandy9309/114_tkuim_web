@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab 驗收前端 - 權限管理版</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; line-height: 1.6; background-color: #f4f7f6; }
+        .section { background: white; border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .admin-badge { background: #ff4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        button { cursor: pointer; padding: 5px 10px; border-radius: 4px; border: 1px solid #ddd; }
+        button:hover { background-color: #e9ecef; }
+        button:disabled { cursor: not-allowed; opacity: 0.5; }
+        .btn-delete { color: #fff; background-color: #dc3545; border: none; }
+        .btn-delete:hover:not(:disabled) { background-color: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>Lab 任務控制面板</h1>
+
+    <div class="section" id="login-section">
+        <h2>使用者登入</h2>
+        <input type="email" id="login-email" placeholder="電子郵件" value="student@test.com">
+        <input type="password" id="login-pass" placeholder="密碼" value="123456">
+        <button onclick="login()">登入</button>
+        <button onclick="logout()">登出</button>
+        <p id="user-info">目前狀態：未登入</p>
+    </div>
+
+    <div class="section">
+        <h2>新增報名資料</h2>
+        <input type="text" id="name" placeholder="姓名">
+        <input type="text" id="phone" placeholder="電話">
+        <button onclick="submitForm()">送出報名</button>
+    </div>
+
+    <div class="section">
+        <h2>報名清單 <button onclick="fetchData()">刷新列表</button></h2>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>擁有者 ID (簡略)</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_AUTH = '/auth';
+        const API_DATA = '/api/signup';
+
+        // 登入功能
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+            
+            try {
+                const res = await fetch(`${API_AUTH}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    updateUI();
+                    await fetchData();
+                    alert('登入成功！');
+                } else {
+                    alert('登入失敗：' + (data.error || '未知錯誤'));
+                }
+            } catch (err) { console.error('登入異常', err); }
+        }
+
+        function logout() {
+            localStorage.clear();
+            updateUI();
+            document.querySelector('#data-table tbody').innerHTML = '';
+            alert('已登出');
+        }
+
+        function updateUI() {
+            const userJson = localStorage.getItem('user');
+            const info = document.getElementById('user-info');
+            if (userJson && userJson !== "undefined") {
+                const user = JSON.parse(userJson);
+                info.innerHTML = `目前登入：<b>${user.email}</b> (${user.role === 'admin' ? '<span class="admin-badge">Admin</span>' : '一般學員'})`;
+            } else {
+                info.innerText = '目前狀態：未登入';
+            }
+        }
+
+        // 取得資料列表
+        async function fetchData() {
+            const token = localStorage.getItem('token');
+            const userJson = localStorage.getItem('user');
+            if (!token || !userJson) return;
+
+            const currentUser = JSON.parse(userJson);
+
+            try {
+                const res = await fetch(API_DATA, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                
+                const tbody = document.querySelector('#data-table tbody');
+                tbody.innerHTML = '';
+                
+                if (!result.data) return;
+
+                result.data.forEach(item => {
+                    // 權限判定：是 Admin 或 資料擁有者
+                    const isOwner = String(item.ownerId) === String(currentUser.id);
+                    const isAdmin = currentUser.role === 'admin';
+                    const canDelete = isOwner || isAdmin;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.id.slice(-6)}</td>
+                            <td>${item.name}</td>
+                            <td title="${item.ownerId}">${item.ownerId.slice(-6)}...</td>
+                            <td>
+                                <button 
+                                    class="${canDelete ? 'btn-delete' : ''}" 
+                                    onclick="deleteItem('${item.id}')" 
+                                    ${canDelete ? '' : 'disabled title="權限不足"'}
+                                >
+                                    ${canDelete ? '刪除' : '禁止'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error('讀取失敗', err); }
+        }
+
+        // 新增資料
+        async function submitForm() {
+            const token = localStorage.getItem('token');
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+
+            if (!name || !phone) return alert('請輸入姓名與電話');
+
+            const res = await fetch(API_DATA, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ name, phone })
+            });
+
+            if (res.ok) {
+                alert('新增成功');
+                document.getElementById('name').value = '';
+                document.getElementById('phone').value = '';
+                fetchData();
+            } else {
+                const data = await res.json();
+                alert('新增失敗：' + data.error);
+            }
+        }
+
+        // 刪除資料
+        async function deleteItem(id) {
+            if (!confirm('確定要刪除此筆資料嗎？')) return;
+
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_DATA}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('刪除成功');
+                    fetchData();
+                } else {
+                    // 如果後端攔截成功，這裡會顯示「權限不足，您只能刪除自己建立的資料」
+                    alert('刪除失敗：' + data.error);
+                    fetchData(); // 重新整理，確保畫面正確
+                }
+            } catch (err) {
+                alert('發送請求失敗');
+            }
+        }
+
+        // 初始化頁面
+        updateUI();
+        if (localStorage.getItem('token')) fetchData();
+    </script>
+</body>
+</html>

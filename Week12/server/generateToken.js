@@ -27,4 +27,4 @@ export function generateToken(user) {
     process.env.JWT_SECRET, // 密鑰 (SecretOrPrivateKey)
     { expiresIn: EXPIRES_IN } // Options: 設定過期時間
   );
-}c
+}

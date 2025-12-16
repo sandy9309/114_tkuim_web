@@ -1,0 +1,70 @@
+@baseUrl = http://localhost:3001
+@adminEmail = admin@example.com
+@studentEmail = studen@test.com
+@password = 123456
+
+### 1. 註冊新學生
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+    "email": "{{studentEmail}}",
+    "password": "{{password}}"
+}
+
+### 2. 學生登入取得 Token
+# @name studentLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "{{studentEmail}}",
+    "password": "{{password}}"
+}
+
+@studentToken = {{studentLogin.response.body.token}}
+@studentId = {{studentLogin.response.body.user.id}}
+
+### 3. 學生新增資料
+# @name createData
+POST {{baseUrl}}/api/signup
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+    "name": "學生小明",
+    "phone": "0912-345-678"
+}
+
+@dataId = {{createData.response.body.id}}
+
+### 4. 驗證權限：未登入嘗試讀取 (預期 401)
+GET {{baseUrl}}/api/signup
+
+### 5. 驗證權限：學生只能看到自己的資料
+GET {{baseUrl}}/api/signup
+Authorization: Bearer {{studentToken}}
+
+### 6. 管理員登入 (請確保資料庫手動改好一組 admin)
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "{{adminEmail}}",
+    "password": "{{password}}"
+}
+
+@adminToken = {{adminLogin.response.body.token}}
+
+### 7. 管理員查看全部資料 (預期看到所有人的資料)
+GET {{baseUrl}}/api/signup
+Authorization: Bearer {{adminToken}}
+
+### 8. 驗證權限：學生嘗試刪除他人的資料 (需手動測試不同 ID，預期 403)
+DELETE {{baseUrl}}/api/signup/some-other-id
+Authorization: Bearer {{studentToken}}
+
+### 9. 執行刪除：學生刪除自己的資料 (預期成功)
+DELETE {{baseUrl}}/api/signup/{{dataId}}
+Authorization: Bearer {{studentToken}}
