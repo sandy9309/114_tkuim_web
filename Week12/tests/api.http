@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3001
 @adminEmail = admin@example.com
-@studentEmail = studen@test.com
+@studentEmail = student@test.com
 @password = 123456
 
 ### 1. 註冊新學生
@@ -22,6 +22,7 @@ Content-Type: application/json
     "password": "{{password}}"
 }
 
+### 
 @studentToken = {{studentLogin.response.body.token}}
 @studentId = {{studentLogin.response.body.user.id}}
 
@@ -36,6 +37,7 @@ Content-Type: application/json
     "phone": "0912-345-678"
 }
 
+### 
 @dataId = {{createData.response.body.id}}
 
 ### 4. 驗證權限：未登入嘗試讀取 (預期 401)
@@ -46,6 +48,7 @@ GET {{baseUrl}}/api/signup
 Authorization: Bearer {{studentToken}}
 
 ### 6. 管理員登入 (請確保資料庫手動改好一組 admin)
+### 6. 管理員登入
 # @name adminLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -55,7 +58,11 @@ Content-Type: application/json
     "password": "{{password}}"
 }
 
-@adminToken = {{adminLogin.response.body.token}}
+
+### 
+@adminToken = {{adminLogin.response.body.user.token}}
+
+
 
 ### 7. 管理員查看全部資料 (預期看到所有人的資料)
 GET {{baseUrl}}/api/signup

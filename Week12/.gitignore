@@ -1,0 +1,13 @@
+# 排除依賴套件
+node_modules/
+server/node_modules/
+
+# 排除環境變數設定檔
+.env
+
+# 排除 Docker 資料庫數據 (這行最重要，解決你剛才的警告)
+Week12/docker/data/
+
+# 排除系統產生的檔案
+.DS_Store
+Thumbs.db
